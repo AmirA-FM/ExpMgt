@@ -20,7 +20,7 @@ if uploaded_file:
 
     for i, row in df.iterrows():
         if pd.isna(row['latitude']) or pd.isna(row['longitude']):
-            lat, lon = geocode_address(row['address'])
+            lat, lon = geocode_address(row['Address'])
             df.at[i, 'latitude'] = lat
             df.at[i, 'longitude'] = lon
 

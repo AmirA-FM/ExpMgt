@@ -3,7 +3,7 @@ import pandas as pd
 from geopy.geocoders import Nominatim
 
 def geocode_address(address):
-    geolocator = Nominatim(user_agent="my_geocoder")
+    geolocator = Nominatim(user_agent="FM_GEOCODER")
     location = geolocator.geocode(address)
     if location:
         return location.latitude, location.longitude

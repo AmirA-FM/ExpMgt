@@ -8,7 +8,7 @@ st.title("📍 Address Geocoder & Validator (Geoapify API)")
 st.write("Upload a CSV file with addresses and cities. The app will geocode missing coordinates using the Geoapify API.")
 
 # API key input
-api_key = st.text_input("🔐 Enter your Geoapify API Key", type="password")
+api_key = "56175b1bf61f4499a63abe45efdcd86f"  # Generate a new code if needed from https://myprojects.geoapify.com/api/RKShInVzmpM9LnXVasBf/keys
 
 # File uploader
 uploaded_file = st.file_uploader("📄 Upload your CSV file", type=["csv"])
@@ -66,5 +66,4 @@ if uploaded_file and api_key:
         st.download_button("📥 Download Updated CSV", csv, "geocoded_output.csv", "text/csv")
     else:
         st.error("❌ The uploaded file must contain 'Address' and 'City' columns.")
-elif uploaded_file and not api_key:
-    st.warning("⚠️ Please enter your Geoapify API key to proceed.")
+

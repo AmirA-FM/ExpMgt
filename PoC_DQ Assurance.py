@@ -1,28 +1,70 @@
 import streamlit as st
 import pandas as pd
-from geopy.geocoders import Nominatim
+import requests
+import time
 
-def geocode_address(address):
-    geolocator = Nominatim(user_agent="FM_GEOCODER")
-    location = geolocator.geocode(address)
-    if location:
-        return location.latitude, location.longitude
-    return None, None
+# Streamlit UI
+st.title("📍 Address Geocoder & Validator (Geoapify API)")
+st.write("Upload a CSV file with addresses and cities. The app will geocode missing coordinates using the Geoapify API.")
 
-st.title("Address Geocoder & Validator")
+# API key input
+api_key = st.text_input("🔐 Enter your Geoapify API Key", type="password")
 
-uploaded_file = st.file_uploader("Upload your CSV", type=["csv"])
-if uploaded_file:
+# File uploader
+uploaded_file = st.file_uploader("📄 Upload your CSV file", type=["csv"])
+
+# Geocoding function using Geoapify
+def geocode_address(address, city, api_key):
+    base_url = "https://api.geoapify.com/v1/geocode/search"
+    params = {
+        "text": f"{address}, {city}, Germany",
+        "apiKey": api_key,
+        "limit": 1,
+        "lang": "de"
+    }
+    response = requests.get(base_url, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        if data["features"]:
+            feature = data["features"][0]
+            lat = feature["geometry"]["coordinates"][1]
+            lon = feature["geometry"]["coordinates"][0]
+            confidence = feature["properties"].get("rank", {}).get("confidence", None)
+            return lat, lon, confidence
+    return None, None, None
+
+# Process the uploaded file
+if uploaded_file and api_key:
     df = pd.read_csv(uploaded_file)
-    
-    if 'latitude' not in df.columns or 'longitude' not in df.columns:
-        df['latitude'], df['longitude'] = None, None
 
-    for i, row in df.iterrows():
-        if pd.isna(row['latitude']) or pd.isna(row['longitude']):
-            lat, lon = geocode_address(row['Address'])
-            df.at[i, 'latitude'] = lat
-            df.at[i, 'longitude'] = lon
+    # Normalize column names
+    df.columns = df.columns.str.strip()
 
-    st.write(df)
-    st.download_button("Download Updated CSV", df.to_csv(index=False), "geocoded.csv")
+    # Ensure required columns exist
+    if "Address" in df.columns and "City" in df.columns:
+        if "Latitude" not in df.columns:
+            df["Latitude"] = None
+        if "Longitude" not in df.columns:
+            df["Longitude"] = None
+        if "Geocoding Confidence" not in df.columns:
+            df["Geocoding Confidence"] = None
+
+        # Geocode missing coordinates
+        for i, row in df.iterrows():
+            if pd.isna(row["Latitude"]) or pd.isna(row["Longitude"]):
+                lat, lon, conf = geocode_address(row["Address"], row["City"], api_key)
+                df.at[i, "Latitude"] = lat
+                df.at[i, "Longitude"] = lon
+                df.at[i, "Geocoding Confidence"] = conf
+                time.sleep(1)  # Respect Geoapify rate limit
+
+        st.success("✅ Geocoding complete!")
+        st.dataframe(df)
+
+        # Download button
+        csv = df.to_csv(index=False).encode("utf-8")
+        st.download_button("📥 Download Updated CSV", csv, "geocoded_output.csv", "text/csv")
+    else:
+        st.error("❌ The uploaded file must contain 'Address' and 'City' columns.")
+elif uploaded_file and not api_key:
+    st.warning("⚠️ Please enter your Geoapify API key to proceed.")

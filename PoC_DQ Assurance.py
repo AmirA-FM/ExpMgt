@@ -62,8 +62,12 @@ def validate_row(row):
         flags["DQ: Missing Coordinates"] = True
     else:
         # Check coordinate range
-        if not (GERMANY_LAT_RANGE[0] <= row["Latitude"] <= GERMANY_LAT_RANGE[1]) or            not (GERMANY_LON_RANGE[0] <= row["Longitude"] <= GERMANY_LON_RANGE[1]):
+        if not (GERMANY_LAT_RANGE[0] <= row["Latitude"] <= GERMANY_LAT_RANGE[1]) or \
+           not (GERMANY_LON_RANGE[0] <= row["Longitude"] <= GERMANY_LON_RANGE[1]):
             flags["DQ: Invalid Coordinates"] = True
+        
+        url = f"https://api.geoapify.com/v1/geocode/reverse?lat={lat}&lon={lon}&apiKey={API_KEY}&lang=de"
+
         else:
             # Reverse geocode and compare city
             rev_city, rev_postal = reverse_geocode(row["Latitude"], row["Longitude"])

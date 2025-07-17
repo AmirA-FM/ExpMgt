@@ -63,17 +63,17 @@ def validate_row(row):
     else:
         # Check coordinate range
 
-    if not (GERMANY_LAT_RANGE[0] <= row["Latitude"] <= GERMANY_LAT_RANGE[1]) or \
-       not (GERMANY_LON_RANGE[0] <= row["Longitude"] <= GERMANY_LON_RANGE[1]):
-        flags["DQ: Invalid Coordinates"] = True
-    else:
-        # Reverse geocode and compare city
-        rev_city, rev_postal = reverse_geocode(row["Latitude"], row["Longitude"])
-        if rev_city and row["City"] and rev_city.lower() != row["City"].lower():
-            flags["DQ: Reverse Geocode Mismatch"] = True
-        if rev_postal and row.get("Postal Code") and str(rev_postal) != str(row["Postal Code"]):
-            flags["DQ: City/Postal Mismatch"] = True
-    
+        if not (GERMANY_LAT_RANGE[0] <= row["Latitude"] <= GERMANY_LAT_RANGE[1]) or \
+           not (GERMANY_LON_RANGE[0] <= row["Longitude"] <= GERMANY_LON_RANGE[1]):
+            flags["DQ: Invalid Coordinates"] = True
+        else:
+            # Reverse geocode and compare city
+            rev_city, rev_postal = reverse_geocode(row["Latitude"], row["Longitude"])
+            if rev_city and row["City"] and rev_city.lower() != row["City"].lower():
+                flags["DQ: Reverse Geocode Mismatch"] = True
+            if rev_postal and row.get("Postal Code") and str(rev_postal) != str(row["Postal Code"]):
+                flags["DQ: City/Postal Mismatch"] = True
+        
             
 
     # Check confidence

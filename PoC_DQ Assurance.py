@@ -69,7 +69,7 @@ def validate_row(row):
         else:
             # Reverse geocode and compare city
             rev_city, rev_postal = reverse_geocode(row["Latitude"], row["Longitude"])
-            if rev_city and row["City"] and rev_city.lower() != row["City"].lower():
+            if rev_city and isinstance(row["City"], str) and rev_city.lower() != row["City"].lower():
                 flags["DQ: Reverse Geocode Mismatch"] = True
             if rev_postal and row.get("Postal Code") and str(rev_postal) != str(row["Postal Code"]):
                 flags["DQ: City/Postal Mismatch"] = True

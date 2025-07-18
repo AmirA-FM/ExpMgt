@@ -104,7 +104,7 @@ if uploaded_file:
     df.columns = df.columns.str.strip()
 
     # Unique ID Validation
-    st.subheader("Unique ID Validation")
+    st.subheader("Policy Count Validation")
     if 'Unique ID' in df.columns:
         total_policies = len(df)
         unique_locations = df['Unique ID'].nunique()
@@ -116,7 +116,7 @@ if uploaded_file:
         st.error("Error: 'Unique ID' column not found in the uploaded CSV.")
 
     # Sum Insured and Deductible Validation
-    st.subheader("Sum Insured and Deductible Validation")
+    st.subheader("Exposure Validation")
     if 'Sum Insured' in df.columns:
         total_rows = len(df)
         invalid_sum_insured = df['Sum Insured'].isna() | ~df['Sum Insured'].apply(lambda x: isinstance(x, (int, float)))

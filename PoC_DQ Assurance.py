@@ -133,7 +133,7 @@ if uploaded_file:
 
 
 #--------------------------
-        # Data Completeness Validation with Gauge Visualizations
+    # GAUGES - Data Completeness Validation with Gauge Visualizations
     import plotly.graph_objects as go
     
     st.subheader("Data Completeness Validation")

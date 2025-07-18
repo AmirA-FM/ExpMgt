@@ -103,6 +103,20 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
     df.columns = df.columns.str.strip()
 
+    # Unique ID Validation
+    st.subheader("Unique ID Validation")
+    if 'Unique ID' in df.columns:
+        total_policies = len(df)
+        unique_locations = df['Unique ID'].nunique()
+        st.write(f"**Number of Policies = {total_policies}**")
+        st.write(f"**Thereof Number of Unique Locations = {unique_locations}**")
+        if total_policies > unique_locations:
+            st.warning(f"Found {total_policies - unique_locations} duplicate Unique ID(s). Consider reviewing for data integrity.")
+    else:
+        st.error("Error: 'Unique ID' column not found in the uploaded CSV.")
+
+
+    
     if "Address" in df.columns and "City" in df.columns:
         if "Latitude" not in df.columns:
             df["Latitude"] = None

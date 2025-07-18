@@ -2,3 +2,4 @@ streamlit
 pandas
 requests
 geopy
+plotly==5.22.0

@@ -115,8 +115,30 @@ if uploaded_file:
     else:
         st.error("Error: 'Unique ID' column not found in the uploaded CSV.")
 
-
+    # Sum Insured and Deductible Validation
+    st.subheader("Sum Insured and Deductible Validation")
+    if 'Sum Insured' in df.columns:
+        total_rows = len(df)
+        invalid_sum_insured = df['Sum Insured'].isna() | ~df['Sum Insured'].apply(lambda x: isinstance(x, (int, float)))
+        invalid_sum_insured_count = invalid_sum_insured.sum()
+        sum_insured_ratio = (1 - invalid_sum_insured_count / total_rows) * 100
+        st.write(f"**Sum Insured reported: {sum_insured_ratio:.2f}%**")
+        if invalid_sum_insured_count > 0:
+            st.warning(f"Found {invalid_sum_insured_count} empty or non-numeric Sum Insured values.")
+    else:
+        st.error("Error: 'Sum Insured' column not found in the uploaded CSV.")
     
+    if 'Deductible' in df.columns:
+        invalid_deductible = df['Deductible'].isna() | ~df['Deductible'].apply(lambda x: isinstance(x, (int, float)))
+        invalid_deductible_count = invalid_deductible.sum()
+        deductible_ratio = (1 - invalid_deductible_count / total_rows) * 100
+        st.write(f"**Deductible reported: {deductible_ratio:.2f}%**")
+        if invalid_deductible_count > 0:
+            st.warning(f"Found {invalid_deductible_count} empty or non-numeric Deductible values.")
+    else:
+        st.error("Error: 'Deductible' column not found in the uploaded CSV.")
+
+   #--------------------------------------- 
     if "Address" in df.columns and "City" in df.columns:
         if "Latitude" not in df.columns:
             df["Latitude"] = None

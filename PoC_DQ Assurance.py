@@ -79,6 +79,8 @@ def validate_row(row):
     # Check confidence
     if row.get("Geocoding Confidence") is not None and row["Geocoding Confidence"] < CONFIDENCE_THRESHOLD:
         flags["DQ: Low Confidence"] = True
+    # The score indicates the reliability of the match e.g. if lower than 100% say 70%, it is e.g. due to misspellings, alternative street names, or partial matching.
+
 
     # Check address completeness
     if isinstance(row["Address"], str):

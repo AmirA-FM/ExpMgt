@@ -130,6 +130,58 @@ if uploaded_file:
         else:
             st.error(f"Error: '{column}' column not found in the uploaded CSV.")
 
+
+
+#--------------------------
+        # Data Completeness Validation with Gauge Visualizations
+    import plotly.graph_objects as go
+    
+    st.subheader("Data Completeness Validation")
+    columns_to_check = ['Sum Insured', 'Deductible', 'Mapped LoB', 'Construction Type', 'Occupancy', 'Year Built', 'Number of Stories', 'Basement']
+    total_rows = len(df)
+    
+    # Create a 2-column layout for gauges
+    cols = st.columns(2)
+    col_idx = 0
+    
+    for column in columns_to_check:
+        if column in df.columns:
+            empty_count = df[column].isna().sum()
+            reported_ratio = (1 - empty_count / total_rows) * 100
+            
+            # Create Plotly gauge chart
+            fig = go.Figure(go.Indicator(
+                mode="gauge+number",
+                value=reported_ratio,
+                title={'text': f"{column} Reported", 'font': {'size': 16}},
+                gauge={
+                    'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "black"},
+                    'bar': {'color': "#1f77b4"},
+                    'steps': [
+                        {'range': [0, 50], 'color': "#ff4d4d"},
+                        {'range': [50, 80], 'color': "#ffeb3b"},
+                        {'range': [80, 100], 'color': "#4caf50"}
+                    ],
+                    'threshold': {
+                        'line': {'color': "black", 'width': 4},
+                        'thickness': 0.75,
+                        'value': 100
+                    }
+                }
+            ))
+            fig.update_layout(height=200, margin=dict(l=10, r=10, t=50, b=10))
+            
+            # Display gauge in the appropriate column
+            with cols[col_idx]:
+                st.plotly_chart(fig, use_container_width=True)
+                if empty_count > 0:
+                    st.warning(f"Found {empty_count} empty {column} values.")
+            
+            # Alternate between columns
+            col_idx = (col_idx + 1) % 2
+        else:
+            st.error(f"Error: '{column}' column not found in the uploaded CSV.")
+    
    #--------------------------------------- 
     if "Address" in df.columns and "City" in df.columns:
         if "Latitude" not in df.columns:

@@ -94,7 +94,7 @@ def validate_row(row):
 # -----------------------------
 # Streamlit UI
 # -----------------------------
-st.title("📍 Geocoding & Data Quality Validator (Germany)")
+st.title("📍 TESTGeocoding & Data Quality Validator (Germany)")
 st.write("Upload a CSV file with addresses and cities. The app will geocode missing coordinates and validate geospatial data quality.")
 
 uploaded_file = st.file_uploader("📄 Upload your CSV file", type=["csv"])

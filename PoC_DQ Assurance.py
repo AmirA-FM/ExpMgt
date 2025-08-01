@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import requests
@@ -191,18 +190,47 @@ if uploaded_file:
         if "Geocoding Confidence" not in df.columns:
             df["Geocoding Confidence"] = None
 
-        # Geocode missing coordinates
-        for i, row in df.iterrows():
-            if pd.isna(row["Latitude"]) or pd.isna(row["Longitude"]):
-                lat, lon, conf = geocode_address(row["Address"], row["City"])
-                df.at[i, "Latitude"] = lat
-                df.at[i, "Longitude"] = lon
-                df.at[i, "Geocoding Confidence"] = conf
-                time.sleep(1)
+        # Add new columns for API results
+        df["API_Latitude"] = None
+        df["API_Longitude"] = None
+        df["API_Confidence"] = None
+        df["Use_API_Coordinates"] = False
 
-        # Data quality checks
+        for i, row in df.iterrows():
+            # Always geocode the address
+            api_lat, api_lon, api_conf = geocode_address(row["Address"], row["City"])
+            df.at[i, "API_Latitude"] = api_lat
+            df.at[i, "API_Longitude"] = api_lon
+            df.at[i, "API_Confidence"] = api_conf
+
+            # Decide which coordinates to use
+            orig_conf = row.get("Geocoding Confidence")
+            if pd.isna(row["Latitude"]) or pd.isna(row["Longitude"]):
+                # No original coordinates, use API
+                df.at[i, "Use_API_Coordinates"] = True
+            elif api_conf is not None and (orig_conf is None or api_conf > orig_conf):
+                # API is more confident
+                df.at[i, "Use_API_Coordinates"] = True
+            else:
+                # Keep original
+                df.at[i, "Use_API_Coordinates"] = False
+
+            # Optionally, update Latitude/Longitude if using API (uncomment if you want this)
+            # if df.at[i, "Use_API_Coordinates"]:
+            #     df.at[i, "Latitude"] = api_lat
+            #     df.at[i, "Longitude"] = api_lon
+            #     df.at[i, "Geocoding Confidence"] = api_conf
+
+            time.sleep(1)
+
+        # Data quality checks (use original or API coordinates as needed)
         dq_flags = []
         for i, row in df.iterrows():
+            # Optionally, validate using the selected coordinates
+            # if row["Use_API_Coordinates"]:
+            #     row["Latitude"] = row["API_Latitude"]
+            #     row["Longitude"] = row["API_Longitude"]
+            #     row["Geocoding Confidence"] = row["API_Confidence"]
             flags = validate_row(row)
             dq_flags.append(flags)
 

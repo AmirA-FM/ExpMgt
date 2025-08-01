@@ -288,12 +288,10 @@ if uploaded_file:
                 ]
                 st.dataframe(
                     df[df["DQ: Large Coordinate Discrepancy"]][columns_to_show]
-                )        csv = result_df.to_csv(index=False).encode("utf-8")
+                )
 
-
-
-
-
-        st.error("❌ The uploaded file must contain 'Address' and 'City' columns.")    else:        st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")        csv = result_df.to_csv(index=False).encode("utf-8")        st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")
+        # Place this after the distance check and before the download button
+        csv = result_df.to_csv(index=False).encode("utf-8")
+        st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")
     else:
-        st.error("❌ The uploaded file must contain 'Address' and 'City' columns.")
+        st.error("❌ The uploaded file must contain 'Address' and 'City' columns.")    else:        st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")        csv = result_df.to_csv(index=False).encode("utf-8")        st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")

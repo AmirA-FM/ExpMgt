@@ -241,21 +241,35 @@ if uploaded_file:
         st.success("✅ Processing complete!")
         st.dataframe(result_df)
 
+        # After processing and displaying the main dataframe/results
+        # Add this after st.dataframe(result_df) and before the download button
+
+        if st.button("🔍 Run Coordinate Distance Check"):
+            # Calculate distance between original and API coordinates
+            df["Coord_Diff_km"] = None
+            for i, row in df.iterrows():
+                if pd.notna(row["Latitude"]) and pd.notna(row["Longitude"]) and \
+                   pd.notna(row["API_Latitude"]) and pd.notna(row["API_Longitude"]):
+                    orig_coords = (row["Latitude"], row["Longitude"])
+                    api_coords = (row["API_Latitude"], row["API_Longitude"])
+                    df.at[i, "Coord_Diff_km"] = geodesic(orig_coords, api_coords).km
+                else:
+                    df.at[i, "Coord_Diff_km"] = None
+
+            # Flag large discrepancies (e.g., >1km)
+            df["DQ: Large Coordinate Discrepancy"] = df["Coord_Diff_km"].apply(lambda x: x is not None and x > 1)
+
+            # Simple report
+            total_checked = df["Coord_Diff_km"].notna().sum()
+            large_discrepancies = df["DQ: Large Coordinate Discrepancy"].sum()
+            st.info(
+                f"Coordinate distance check complete: {total_checked} rows checked. "
+                f"{large_discrepancies} rows have a coordinate difference greater than 1 km."
+            )
+            if large_discrepancies > 0:
+                st.warning("Some records have significant coordinate discrepancies. Please review them.")
+
         csv = result_df.to_csv(index=False).encode("utf-8")
         st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")
     else:
         st.error("❌ The uploaded file must contain 'Address' and 'City' columns.")
-
-    # Calculate distance between original and API coordinates
-    df["Coord_Diff_km"] = None
-    for i, row in df.iterrows():
-        if pd.notna(row["Latitude"]) and pd.notna(row["Longitude"]) and \
-           pd.notna(row["API_Latitude"]) and pd.notna(row["API_Longitude"]):
-            orig_coords = (row["Latitude"], row["Longitude"])
-            api_coords = (row["API_Latitude"], row["API_Longitude"])
-            df.at[i, "Coord_Diff_km"] = geodesic(orig_coords, api_coords).km
-        else:
-            df.at[i, "Coord_Diff_km"] = None
-
-    # Optionally, flag large discrepancies (e.g., >1km)
-    df["DQ: Large Coordinate Discrepancy"] = df["Coord_Diff_km"].apply(lambda x: x is not None and x > 1)

@@ -294,4 +294,4 @@ if uploaded_file:
         csv = result_df.to_csv(index=False).encode("utf-8")
         st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")
     else:
-        st.error("❌ The uploaded file must contain 'Address' and 'City' columns.")    else:        st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")        csv = result_df.to_csv(index=False).encode("utf-8")        st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")
+        st.error("❌ The uploaded file must contain 'Address' and 'City' columns.")

@@ -277,20 +277,17 @@ if uploaded_file:
 
                 # Show details for rows with large discrepancies
                 st.write("### Rows with >1km coordinate difference")
+                columns_to_show = [
+                    "Unique ID", "Address", "City", "Postal Code",
+                    "Latitude", "Longitude", "API_Latitude", "API_Longitude",
+                    "Geocoding Confidence", "API_Confidence", "Coord_Diff_km"
+                ] if "Unique ID" in df.columns else [
+                    "Address", "City", "Postal Code",
+                    "Latitude", "Longitude", "API_Latitude", "API_Longitude",
+                    "Geocoding Confidence", "API_Confidence", "Coord_Diff_km"
+                ]
                 st.dataframe(
-                    df[df["DQ: Large Coordinate Discrepancy"]][
-                        [
-                            "Unique ID", "Address", "City", "Postal Code",
-                            "Latitude", "Longitude", "API_Latitude", "API_Longitude",
-                            "Geocoding Confidence", "API_Confidence", "Coord_Diff_km"
-                        ]
-                        if "Unique ID" in df.columns else
-                        [
-                            "Address", "City", "Postal Code",
-                            "Latitude", "Longitude", "API_Latitude", "API_Longitude",
-                            "Geocoding Confidence", "API_Confidence", "Coord_Diff_km"
-                        ]       )
-                    ]
+                    df[df["DQ: Large Coordinate Discrepancy"]][columns_to_show]
                 )        csv = result_df.to_csv(index=False).encode("utf-8")
 
 

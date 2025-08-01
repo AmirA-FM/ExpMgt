@@ -94,26 +94,7 @@ def validate_row(row):
 # -----------------------------
 # Streamlit UI
 # -----------------------------
-st.title("📍 if large_discrepancies > 0:
-    st.warning("Some records have significant coordinate discrepancies. Please review them.")
-
-    # Show details for rows with large discrepancies
-    st.write("### Rows with >1km coordinate difference")
-    st.dataframe(
-        df[df["DQ: Large Coordinate Discrepancy"]][
-            [
-                "Unique ID", "Address", "City", "Postal Code",
-                "Latitude", "Longitude", "API_Latitude", "API_Longitude",
-                "Geocoding Confidence", "API_Confidence", "Coord_Diff_km"
-            ]
-            if "Unique ID" in df.columns else
-            [
-                "Address", "City", "Postal Code",
-                "Latitude", "Longitude", "API_Latitude", "API_Longitude",
-                "Geocoding Confidence", "API_Confidence", "Coord_Diff_km"
-            ]
-        ]
-    )Geocoding & Data Quality Validator (Germany)")
+st.title("📍 Geocoding & Data Quality Validator (Germany)")
 st.write("Upload a CSV file with addresses and cities. The app will geocode missing coordinates and validate geospatial data quality.")
 
 uploaded_file = st.file_uploader("📄 Upload your CSV file", type=["csv"])

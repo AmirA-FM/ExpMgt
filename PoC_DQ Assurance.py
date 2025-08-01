@@ -15,10 +15,14 @@ CONFIDENCE_THRESHOLD = 0.8
 # -----------------------------
 # Geocoding Functions
 # -----------------------------
-def geocode_address(address, city):
+def geocode_address(address, city, postal_code=None):
     base_url = "https://api.geoapify.com/v1/geocode/search"
+    # Build the query string with postal code if available
+    query = f"{address}, {city}, Germany"
+    if postal_code and not pd.isna(postal_code):
+        query = f"{address}, {postal_code} {city}, Germany"
     params = {
-        "text": f"{address}, {city}, Germany",
+        "text": query,
         "apiKey": API_KEY,
         "limit": 1,
         "lang": "de"
@@ -199,7 +203,9 @@ if uploaded_file:
 
         for i, row in df.iterrows():
             # Always geocode the address
-            api_lat, api_lon, api_conf = geocode_address(row["Address"], row["City"])
+            api_lat, api_lon, api_conf = geocode_address(
+        row["Address"], row["City"], row.get("Postal Code")
+    )
             df.at[i, "API_Latitude"] = api_lat
             df.at[i, "API_Longitude"] = api_lon
             df.at[i, "API_Confidence"] = api_conf
@@ -283,11 +289,14 @@ if uploaded_file:
                             "Address", "City", "Postal Code",
                             "Latitude", "Longitude", "API_Latitude", "API_Longitude",
                             "Geocoding Confidence", "API_Confidence", "Coord_Diff_km"
-                        ]
+                        ]       )
                     ]
-                )
+                )        csv = result_df.to_csv(index=False).encode("utf-8")
 
-        csv = result_df.to_csv(index=False).encode("utf-8")
-        st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")
+
+
+
+
+        st.error("❌ The uploaded file must contain 'Address' and 'City' columns.")    else:        st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")        csv = result_df.to_csv(index=False).encode("utf-8")        st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")
     else:
         st.error("❌ The uploaded file must contain 'Address' and 'City' columns.")

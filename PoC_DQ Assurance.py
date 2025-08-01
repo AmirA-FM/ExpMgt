@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 import time
+from geopy.distance import geodesic
 
 # -----------------------------
 # Configuration
@@ -244,3 +245,17 @@ if uploaded_file:
         st.download_button("📥 Download Validated CSV", csv, "geocoded_validated.csv", "text/csv")
     else:
         st.error("❌ The uploaded file must contain 'Address' and 'City' columns.")
+
+    # Calculate distance between original and API coordinates
+    df["Coord_Diff_km"] = None
+    for i, row in df.iterrows():
+        if pd.notna(row["Latitude"]) and pd.notna(row["Longitude"]) and \
+           pd.notna(row["API_Latitude"]) and pd.notna(row["API_Longitude"]):
+            orig_coords = (row["Latitude"], row["Longitude"])
+            api_coords = (row["API_Latitude"], row["API_Longitude"])
+            df.at[i, "Coord_Diff_km"] = geodesic(orig_coords, api_coords).km
+        else:
+            df.at[i, "Coord_Diff_km"] = None
+
+    # Optionally, flag large discrepancies (e.g., >1km)
+    df["DQ: Large Coordinate Discrepancy"] = df["Coord_Diff_km"].apply(lambda x: x is not None and x > 1)

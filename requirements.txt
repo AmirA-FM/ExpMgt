@@ -2,4 +2,6 @@ streamlit
 pandas
 requests
 geopy
+anthropic
 plotly==5.22.0
+
